@@ -17,7 +17,6 @@ public class BaseDados {
 
     Connection c = null;
     Statement stmt = null;
-    PreparedStatement pstmt;
     String createTableQuery = null;
     int id_aluno = 1;
     String nomeTabela = "a";
@@ -51,62 +50,15 @@ public class BaseDados {
     }
 
     @WebMethod
-    public String criarTabela(@WebParam(name = "tableName") String tableName) {
-        String mensagem = "";
-        nomeTabela = tableName;
-        System.out.println("Nome da tabela: " + nomeTabela);
-        try {
-            if (conectarPostsgresql()) {
-                System.out.println("Base dados conetada, estou a criar a tabela...");
-                stmt = c.createStatement();
-                //verificar se a tabela existe
-                boolean exists = c.getMetaData().getTables(null, null, nomeTabela, null).next();
-
-                if (exists) {
-                    //faça algo se a tabela existir
-                    System.out.println("A tabela existe, a remover...");
-                    String sql = "DROP TABLE " + nomeTabela + ";";
-                    //stmt = c.createStatement();
-                    stmt.execute(sql);
-                    System.out.println("Tabela removida com sucesso!");
-                }
-                System.out.println("A criar tabela...");
-                createTableQuery = "CREATE TABLE  \"" + nomeTabela + "\" ( "
-                        + "id_aluno serial,"
-                        + "nome varchar,"
-                        + "disciplinas varchar,"
-                        + "cursos varchar );";
-
-                stmt.execute(createTableQuery);
-                mensagem = "Tabela criada!";
-                stmt.close();
-                //c.close();
-            } else {
-                mensagem = "Base dados desligada, em primeiro lugar ligue-a!";
-            }
-
-        } catch (SQLException ex) {
-            mensagem = "Erro ct: " + ex.getMessage();
-        }
-
-        return mensagem;
-    }
-
-    @WebMethod
     public String adicionar(@WebParam(name = "nome") String nome, @WebParam(name = "disciplina") String disciplina, @WebParam(name = "cursos") String cursos) {
         String mensagem = "";
         try {
             //verifica se existe ligação ao postgresql
-            if (conectarPostsgresql() == true) {
+            if (conectarPostsgresql()) {
                 //verificar se a tabela existe
 
                 System.out.println("Nome da tabela:" + nomeTabela);
                 boolean exists = c.getMetaData().getTables(null, null, nomeTabela, null).next();
-                if (!exists) {
-                    //condição, caso não exista tabela
-                    System.out.println("Nova tabela criada.\n");
-                    criarTabela("novaTabela");
-                }
                 //Class.forName("org.postgresql.Driver");
                 //c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "rafael");
                 System.out.println("Base dados conetada, estou a adicionar...");
@@ -135,19 +87,55 @@ public class BaseDados {
     }
 
     @WebMethod
+    public String editar(@WebParam(name = "tabela") String tabela, @WebParam(name = "dados") String[] dados) {
+
+        /*if(tabela.equals("blahblah")){
+            UPDATE tabela SET (dados,dados,dados) VALUES (?,?,?)
+            stmt.setString(2, dados[0]);
+        }*/
+
+        String mensagem = "";
+        try {
+            //verifica se existe ligação ao postgresql
+            if (conectarPostsgresql()) {
+                //verificar se a tabela existe
+
+                System.out.println("Nome da tabela:" + nomeTabela);
+                boolean exists = c.getMetaData().getTables(null, null, nomeTabela, null).next();
+                //Class.forName("org.postgresql.Driver");
+                //c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "rafael");
+                System.out.println("Base dados conetada, estou a adicionar...");
+                createTableQuery = "UPDATE \"" + nomeTabela + "SET \" (nome, disciplinas, cursos) VALUES (?,?,?);";
+                PreparedStatement stmt = c.prepareStatement(createTableQuery);
+                //stmt.setString(2, nome);
+                //stmt.setString(3, disciplina);
+                //stmt.setString(4, cursos);
+                System.out.println("Id do aluno: " + id_aluno);
+                stmt.execute(); // Executa o PreparedStatement com o SQL já incluso e os valoes Setados
+                //stmt.close();
+                //System.out.println("Inserido aluno: " + nome);
+                //mensagem = "Inserido com sucesso o aluno: " + nome;
+                stmt.close();
+                //c.close();
+            } else {
+                mensagem = "Base dados desligada, em primeiro lugar ligue-a!";
+            }
+
+        } catch (Exception e) {
+            mensagem = "Erro a: " + e.getMessage();
+        }
+        return mensagem;
+    }
+
+    @WebMethod
     public String ver(@WebParam(name = "nome") String nome) {
         String mensagem = "";
         try {
-            if (conectarPostsgresql() == true) {
+            if (conectarPostsgresql()) {
                 //verificar se a tabela existe
                 System.out.println("Nome da tabela:" + nomeTabela);
                 boolean exists = c.getMetaData().getTables(null, null, nomeTabela, null).next();
 
-                if (!exists) {
-                    //condição, caso não exista tabela
-                    System.out.println("Nova tabela criada.\n");
-                    criarTabela("novaTabela");
-                }
                 //Class.forName("org.postgresql.Driver");
                 //c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "rafael");
                 System.out.println("Base dados conetada, a preparar a informação pedida...");
@@ -180,17 +168,11 @@ public class BaseDados {
     public String verTodaInformacao() {
         String mensagem = "";
         try {
-            if (conectarPostsgresql() == true) {
+            if (conectarPostsgresql()) {
 
                 //verificar se a tabela existe
                 System.out.println("Nome da tabela:" + nomeTabela);
                 boolean exists = c.getMetaData().getTables(null, null, nomeTabela, null).next();
-
-                if (!exists) {
-                    //condição, caso não exista tabela
-                    System.out.println("Nova tabela criada.\n");
-                    criarTabela("novaTabela");
-                }
 
                 //Class.forName("org.postgresql.Driver");
                 //c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "rafael");
@@ -222,7 +204,7 @@ public class BaseDados {
     @WebMethod
     public void remover(@WebParam(name = "nome") String nome) {
         try {
-            if (conectarPostsgresql() == true) {
+            if (conectarPostsgresql()) {
                 //Class.forName("org.postgresql.Driver");
                 //c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "rafael");
                 System.out.println("A preparar a remoção...");
