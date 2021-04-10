@@ -20,9 +20,9 @@ public class Ingredientes {
     public String adicionarIngrediente(@WebParam(name = "nome") String nome) {
         String mensagem = "";
         try {
-            if (bd.conectarPostsgresql()) {
+            if ((c = bd.conectarPostsgresql()) != null) {
                 System.out.println("Base dados conetada, estou a adicionar...");
-                createTableQuery = "INSERT INTO ingredientes(nome) VALUES (?);";
+                createTableQuery = "INSERT INTO ingredientes(nome) VALUES(?)";
                 PreparedStatement stmt = c.prepareStatement(createTableQuery);
                 System.out.println("2");
                 stmt.setString(1, nome);
@@ -43,7 +43,7 @@ public class Ingredientes {
     public String removerIngrediente(@WebParam(name = "nomeIngrediente") String nomeIngrediente) {
         String mensagem = "";
         try {
-            if (bd.conectarPostsgresql()) {
+            if ((c = bd.conectarPostsgresql()) != null) {
                 stmt = c.createStatement();
                 String sql = "DELETE FROM ingredientes WHERE nome ilike '" + nomeIngrediente + "'";
                 int i = stmt.executeUpdate(sql);
@@ -66,7 +66,7 @@ public class Ingredientes {
     @WebMethod
     public void verTodosOsIngredientes() {
         try {
-            if (bd.conectarPostsgresql()) {
+            if ((c = bd.conectarPostsgresql()) != null) {
                 stmt = c.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT * FROM ingredientes;");
                 while (rs.next()) {

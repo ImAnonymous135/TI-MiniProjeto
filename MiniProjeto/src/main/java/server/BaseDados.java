@@ -20,17 +20,14 @@ public class BaseDados {
     String createTableQuery = null;
 
     @WebMethod
-    public boolean conectarPostsgresql() {
-        boolean conetou;
+    public Connection conectarPostsgresql() {
         try {
             Class.forName("org.postgresql.Driver");
-            c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/miniProjeto_TI", "postgres", "rafael");
-            conetou = true;
+            c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/miniProjeto_TI", "postgres", "password");
         } catch (Exception ex) {
-            conetou = false;
             Logger.getLogger(BaseDados.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return conetou;
+        return c;
     }
 
     @WebMethod

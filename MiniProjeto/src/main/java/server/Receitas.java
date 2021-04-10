@@ -26,7 +26,7 @@ public class Receitas {
     public String adicionarReceitas(@WebParam(name = "nomeReceitas") String nomeReceitas) {
         String mensagem = "";
         try {
-            if (bd.conectarPostsgresql()) {
+            if ((c = bd.conectarPostsgresql()) != null) {
                 System.out.println("Base dados conetada!");
                 createTableQuery = "INSERT INTO ingredientes(id,nome) VALUES (?,?);";
                 PreparedStatement stmt = c.prepareStatement(createTableQuery);
@@ -48,7 +48,7 @@ public class Receitas {
     public String removerReceita(@WebParam(name = "nomeReceita") String nomeReceita) {
         String mensagem = "";
         try {
-            if (bd.conectarPostsgresql()) {
+            if ((c = bd.conectarPostsgresql()) != null) {
                 stmt = c.createStatement();
                 String sql = "DELETE FROM ingredientes WHERE nome ilike '" + nomeReceita + "'";
                 int i = stmt.executeUpdate(sql);
