@@ -17,23 +17,22 @@ public class Ingredientes {
     Connection c = null;
 
     @WebMethod
-    public String adicionarIngrediente(@WebParam(name = "nomeIngrediente") String nomeIngrediente) {
+    public String adicionarIngrediente(@WebParam(name = "nome") String nome) {
         String mensagem = "";
         try {
-            //verifica se existe ligação ao postgresql
             if (bd.conectarPostsgresql()) {
-                System.out.println("Base dados conetada!");
-                c.getMetaData().getTables(null, null, "ingredientes", null).next();
-                createTableQuery = "INSERT INTO ingredientes(id,nome) VALUES (?,?);";
+                System.out.println("Base dados conetada, estou a adicionar...");
+                createTableQuery = "INSERT INTO ingredientes(nome) VALUES (?);";
                 PreparedStatement stmt = c.prepareStatement(createTableQuery);
-                stmt.setString(1, nomeIngrediente);
-                stmt.execute(); // Executa o PreparedStatement com o SQL jÃ¡ incluso e os valoes Setados
-                mensagem = "Inserido com sucesso o ingrediente: " + nomeIngrediente;
+                System.out.println("2");
+                stmt.setString(1, nome);
+                stmt.execute();
+                System.out.println("Inserido aluno: " + nome);
+                mensagem = "Inserido com sucesso o aluno: " + nome;
                 stmt.close();
             } else {
                 mensagem = "Base dados desligada, em primeiro lugar ligue-a!";
             }
-
         } catch (Exception e) {
             mensagem = "Erro a: " + e.getMessage();
         }
@@ -79,5 +78,5 @@ public class Ingredientes {
             e.getMessage();
         }
     }
-    
+
 }

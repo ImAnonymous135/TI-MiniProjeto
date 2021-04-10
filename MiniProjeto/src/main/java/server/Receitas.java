@@ -28,7 +28,6 @@ public class Receitas {
         try {
             if (bd.conectarPostsgresql()) {
                 System.out.println("Base dados conetada!");
-                c.getMetaData().getTables(null, null, "ingredientes", null).next();
                 createTableQuery = "INSERT INTO ingredientes(id,nome) VALUES (?,?);";
                 PreparedStatement stmt = c.prepareStatement(createTableQuery);
                 stmt.setString(1, nomeReceitas);
