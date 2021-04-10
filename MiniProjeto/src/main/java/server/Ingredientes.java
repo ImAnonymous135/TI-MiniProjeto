@@ -26,11 +26,9 @@ public class Ingredientes {
                 System.out.println("Base dados conetada, estou a adicionar...");
                 createTableQuery = "INSERT INTO ingredientes(nome) VALUES(?)";
                 PreparedStatement stmt = c.prepareStatement(createTableQuery);
-                System.out.println("2");
                 stmt.setString(1, nome);
                 stmt.execute();
-                System.out.println("Inserido aluno: " + nome);
-                mensagem = "Inserido com sucesso o aluno: " + nome;
+                mensagem = "Inserido com sucesso o ingrediente: " + nome;
                 stmt.close();
             } else {
                 mensagem = "Base dados desligada, em primeiro lugar ligue-a!";
@@ -66,19 +64,31 @@ public class Ingredientes {
     }
 
     @WebMethod
-    public void verTodosOsIngredientes() {
+    public String[] verTodosOsIngredientes() {
+        int size = 0, i = 0;
+        String[] ingredientes = null;
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
-                stmt = c.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * FROM ingredientes;");
-                while (rs.next()) {
-                    rs.getString("nome");
+                System.out.println("Aqui");
+                PreparedStatement pstmt = c.prepareStatement("SELECT * FROM ingredientes;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                ResultSet rs = pstmt.executeQuery();
+                if (rs != null) {
+                    rs.last();
+                    size = rs.getRow();
+                    rs.beforeFirst();
                 }
-                stmt.close();
+                ingredientes = new String[size];
+                while (rs.next()) {
+                    ingredientes[i] = rs.getString("nome");
+                    i++;
+                }
+                pstmt.close();
             }
         } catch (Exception e) {
-            e.getMessage();
+            return new String[]{e.getMessage()};
         }
+
+        return ingredientes;
     }
 
 }

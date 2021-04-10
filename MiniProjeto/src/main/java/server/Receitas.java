@@ -7,6 +7,7 @@ package server;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -69,6 +70,34 @@ public class Receitas {
             mensagem = e.getMessage();
         }
         return mensagem;
+    }
+
+    @WebMethod
+    public String[] verTodasAsReceitas() {
+        int size = 0, i = 0;
+        String[] ingredientes = null;
+        try {
+            if ((c = bd.conectarPostsgresql()) != null) {
+                System.out.println("Aqui");
+                PreparedStatement pstmt = c.prepareStatement("SELECT * FROM receitas;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                ResultSet rs = pstmt.executeQuery();
+                if (rs != null) {
+                    rs.last();
+                    size = rs.getRow();
+                    rs.beforeFirst();
+                }
+                ingredientes = new String[size];
+                while (rs.next()) {
+                    ingredientes[i] = rs.getString("nome");
+                    i++;
+                }
+                pstmt.close();
+            }
+        } catch (Exception e) {
+            return new String[]{e.getMessage()};
+        }
+
+        return ingredientes;
     }
     
     
