@@ -10,11 +10,14 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
+import javax.jws.WebService;
 
 /**
  *
  * @author Asus
  */
+
+@WebService
 public class Receitas {
     
     BaseDados bd = new BaseDados();

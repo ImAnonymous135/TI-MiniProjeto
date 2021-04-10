@@ -8,7 +8,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
+import javax.jws.WebService;
 
+@WebService
 public class Ingredientes {
 
     BaseDados bd = new BaseDados();
