@@ -27,14 +27,15 @@ public class Receitas {
     Connection c = null;
     
     @WebMethod
-    public String adicionarReceitas(@WebParam(name = "nomeReceitas") String nomeReceitas) {
+    public String adicionarReceitas(@WebParam(name = "nomeReceitas") String nomeReceitas, @WebParam(name = "instrucoes") String instrucoes) {
         String mensagem = "";
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
                 System.out.println("Base dados conetada!");
-                createTableQuery = "INSERT INTO ingredientes(id,nome) VALUES (?,?);";
+                createTableQuery = "INSERT INTO ingredientes(nome, instrucoes) VALUES (?,?);";
                 PreparedStatement stmt = c.prepareStatement(createTableQuery);
                 stmt.setString(1, nomeReceitas);
+                stmt.setString(2, instrucoes);
                 stmt.execute(); // Executa o PreparedStatement com o SQL já incluso e os valoes Setados
                 mensagem = "Inserido com sucesso a receita: " + nomeReceitas;
                 stmt.close();
@@ -89,6 +90,7 @@ public class Receitas {
                 ingredientes = new String[size];
                 while (rs.next()) {
                     ingredientes[i] = rs.getString("nome");
+                    ingredientes[i] += rs.getString("instrucoes");
                     i++;
                 }
                 pstmt.close();
