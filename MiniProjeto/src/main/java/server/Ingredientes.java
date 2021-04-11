@@ -69,7 +69,6 @@ public class Ingredientes {
         String[] ingredientes = null;
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
-                System.out.println("Aqui");
                 PreparedStatement pstmt = c.prepareStatement("SELECT * FROM ingredientes;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 ResultSet rs = pstmt.executeQuery();
                 if (rs != null) {

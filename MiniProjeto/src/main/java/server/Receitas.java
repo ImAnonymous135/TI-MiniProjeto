@@ -12,6 +12,7 @@ import java.sql.Statement;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
+import java.util.ArrayList;
 
 /**
  *
@@ -32,7 +33,7 @@ public class Receitas {
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
                 System.out.println("Base dados conetada!");
-                createTableQuery = "INSERT INTO ingredientes(id,nome) VALUES (?,?);";
+                createTableQuery = "INSERT INTO ingredientes(nome) VALUES (?);";
                 PreparedStatement stmt = c.prepareStatement(createTableQuery);
                 stmt.setString(1, nomeReceitas);
                 stmt.execute(); // Executa o PreparedStatement com o SQL já incluso e os valoes Setados
@@ -73,31 +74,107 @@ public class Receitas {
     }
 
     @WebMethod
-    public String[] verTodasAsReceitas() {
-        int size = 0, i = 0;
-        String[] ingredientes = null;
+    public String adicionarIngrediente(@WebParam(name = "receita") String receita,@WebParam(name = "ingrediente") String ingrediente){
+        int id, id_R;
+        try{
+            if((c = bd.conectarPostsgresql()) != null){
+                PreparedStatement psmt = c.prepareStatement("SELECT id FROM ingredientes WHERE nome = ?");
+                psmt.setString(1, ingrediente);
+                ResultSet rs = psmt.executeQuery();
+                if(rs.next()){
+                    id = rs.getInt("id");
+                    PreparedStatement psmt_R = c.prepareStatement("SELECT id FROM receitas WHERE nome = ?");
+                    psmt_R.setString(1, receita);
+                    ResultSet rs_R = psmt_R.executeQuery();
+                    if(rs_R.next()){
+                        id_R = rs_R.getInt("id");
+                        PreparedStatement psmt_F = c.prepareStatement("INSERT INTO ingredientes_receitas(receita_id,ingrediente_id) VALUES(?,?)");
+                        psmt_F.setInt(1,id_R);
+                        psmt_F.setInt(2,id);
+                        psmt_F.execute();
+                        return "Ingrediente adicionado à receita com sucesso!";
+                    }
+                }
+            }
+            return "Base de dados desligada!";
+        }catch(Exception e){
+            return e.getMessage();
+        }
+    }
+
+    @WebMethod
+    public String removerIngrediente(@WebParam(name = "receita") String receita,@WebParam(name = "ingrediente") String ingrediente){
+        int id, id_R;
+        try{
+            if((c = bd.conectarPostsgresql()) != null){
+                PreparedStatement psmt = c.prepareStatement("SELECT id FROM ingredientes WHERE nome = ?");
+                psmt.setString(1, ingrediente);
+                ResultSet rs = psmt.executeQuery();
+                if(rs.next()){
+                    id = rs.getInt("id");
+                    PreparedStatement psmt_R = c.prepareStatement("SELECT id FROM receitas WHERE nome = ?");
+                    psmt_R.setString(1, receita);
+                    ResultSet rs_R = psmt_R.executeQuery();
+                    if(rs_R.next()){
+                        id_R = rs_R.getInt("id");
+                        PreparedStatement psmt_F = c.prepareStatement("DELETE FROM ingredientes_receitas WHERE receita_id = ? AND ingrediente_id = ?");
+                        psmt_F.setInt(1,id_R);
+                        psmt_F.setInt(2,id);
+                        psmt_F.execute();
+                        return "Ingrediente removida da receita com sucesso!";
+                    }
+                }
+            }
+            return "Base de dados desligada!";
+        }catch(Exception e){
+            return e.getMessage();
+        }
+    }
+
+
+    private void listarIngredientes(Receita receita){
+        int id_R;
+
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
-                System.out.println("Aqui");
+                PreparedStatement psmt_R = c.prepareStatement("SELECT id FROM receitas WHERE nome = ?");
+                psmt_R.setString(1, receita.getNome());
+                ResultSet rs_R = psmt_R.executeQuery();
+                if (rs_R.next()) {
+                    id_R = rs_R.getInt("id");
+                    PreparedStatement pstmt = c.prepareStatement("SELECT i.nome FROM ingredientes_receitas AS ir INNER JOIN ingredientes i ON i.id = ir.ingrediente_id WHERE ir.receita_id = ?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                    pstmt.setInt(1, id_R);
+                    ResultSet rs = pstmt.executeQuery();
+                    while (rs.next()) {
+                        receita.addIngrediente(rs.getString("nome"));
+                    }
+                    pstmt.close();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @WebMethod
+    public ArrayList<Receita> verTodasAsReceitas() {
+        ArrayList<Receita> receitas = new ArrayList<Receita>();
+        try {
+            if ((c = bd.conectarPostsgresql()) != null) {
                 PreparedStatement pstmt = c.prepareStatement("SELECT * FROM receitas;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 ResultSet rs = pstmt.executeQuery();
-                if (rs != null) {
-                    rs.last();
-                    size = rs.getRow();
-                    rs.beforeFirst();
-                }
-                ingredientes = new String[size];
                 while (rs.next()) {
-                    ingredientes[i] = rs.getString("nome");
-                    i++;
+                    Receita temp = new Receita(rs.getString("nome"), rs.getString("instrucoes"));
+                    listarIngredientes(temp);
+                    receitas.add(temp);
                 }
                 pstmt.close();
             }
         } catch (Exception e) {
-            return new String[]{e.getMessage()};
+            return null;
         }
 
-        return ingredientes;
+        return receitas;
     }
     
     
