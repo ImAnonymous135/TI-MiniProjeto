@@ -1,6 +1,5 @@
 package server;
 
-import client.FormIngredients;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,17 +39,19 @@ public class Ingredientes {
     }
 
     @WebMethod
-    public String removerIngrediente(@WebParam(name = "nomeIngrediente") String nomeIngrediente) {
-        String mensagem = "";
+    public String removerIngrediente(@WebParam(name = "nome") String nome) {
+        String mensagem = null;
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
+                System.out.println("Base dados contetada, a remover..");
                 stmt = c.createStatement();
-                String sql = "DELETE FROM ingredientes WHERE nome ilike '" + nomeIngrediente + "'";
-                int i = stmt.executeUpdate(sql);
-                if (i == 0) {
-                    mensagem = "Erro ao remover!";
-                } else {
-                    mensagem = "Removido com sucesos!";
+                createTableQuery = "DELETE FROM ingredientes WHERE nome ilike '" + nome + "';";
+
+                int r = stmt.executeUpdate(createTableQuery);
+                if (r == 0) {
+                    mensagem = "Erro ao remover, tente novamente...";
+                } else if (r == 1) {
+                    mensagem = "Removido com sucesso!";
                 }
                 stmt.close();
                 c.close();
