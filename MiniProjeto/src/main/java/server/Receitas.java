@@ -33,14 +33,22 @@ public class Receitas {
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
                 System.out.println("Base dados conetada!");
-                createTableQuery = "INSERT INTO receitas(nome, instrucoes) VALUES (?,?);";
+                PreparedStatement pstmt = c.prepareStatement("SELECT id FROM receitas WHERE nome = ?");
+                pstmt.setString(1, nomeReceitas);
+                ResultSet rs = pstmt.executeQuery();
+                if(rs.next()){
+                    mensagem = "Já existe esse nome!";
+                } else {
+                    createTableQuery = "INSERT INTO receitas(nome, instrucoes) VALUES (?,?);";
 
-                PreparedStatement stmt = c.prepareStatement(createTableQuery);
-                stmt.setString(1, nomeReceitas);
-                stmt.setString(2, instrucoes);
-                stmt.execute(); // Executa o PreparedStatement com o SQL já incluso e os valoes Setados
-                mensagem = "Inserido com sucesso a receita: " + nomeReceitas;
-                stmt.close();
+                    PreparedStatement stmt = c.prepareStatement(createTableQuery);
+                    stmt.setString(1, nomeReceitas);
+                    stmt.setString(2, instrucoes);
+                    stmt.execute(); // Executa o PreparedStatement com o SQL já incluso e os valoes Setados
+                    mensagem = "Inserido com sucesso a receita: " + nomeReceitas;
+                    stmt.close();
+                }
+
             } else {
                 mensagem = "Base dados desligada, em primeiro lugar ligue-a!";
             }
