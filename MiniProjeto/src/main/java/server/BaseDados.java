@@ -23,7 +23,7 @@ public class BaseDados {
     public Connection conectarPostsgresql() {
         try {
             Class.forName("org.postgresql.Driver");
-            c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/miniProjeto_TI", "postgres", "rafael");
+            c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/miniProjeto_TI", "postgres", "password");
         } catch (Exception ex) {
             Logger.getLogger(BaseDados.class.getName()).log(Level.SEVERE, null, ex);
         }

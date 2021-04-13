@@ -33,7 +33,7 @@ public class Receitas {
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
                 System.out.println("Base dados conetada!");
-                createTableQuery = "INSERT INTO ingredientes(nome) VALUES (?);";
+                createTableQuery = "INSERT INTO receitas(nome, instrucoes) VALUES (?,?);";
 
                 PreparedStatement stmt = c.prepareStatement(createTableQuery);
                 stmt.setString(1, nomeReceitas);
@@ -57,7 +57,7 @@ public class Receitas {
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
                 stmt = c.createStatement();
-                String sql = "DELETE FROM ingredientes WHERE nome ilike '" + nomeReceita + "'";
+                String sql = "DELETE FROM receitas WHERE nome ilike '" + nomeReceita + "'";
                 int i = stmt.executeUpdate(sql);
                 if (i == 0) {
                     mensagem = "Erro ao remover!";
@@ -133,14 +133,15 @@ public class Receitas {
         }
     }
 
-
-    private void listarIngredientes(Receita receita){
+    @WebMethod
+    public ArrayList<String> listarIngredientes(String receita){
         int id_R;
+        ArrayList<String> ingredientesR = new ArrayList<String>();
 
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
                 PreparedStatement psmt_R = c.prepareStatement("SELECT id FROM receitas WHERE nome = ?");
-                psmt_R.setString(1, receita.getNome());
+                psmt_R.setString(1, receita);
                 ResultSet rs_R = psmt_R.executeQuery();
                 if (rs_R.next()) {
                     id_R = rs_R.getInt("id");
@@ -148,7 +149,7 @@ public class Receitas {
                     pstmt.setInt(1, id_R);
                     ResultSet rs = pstmt.executeQuery();
                     while (rs.next()) {
-                        receita.addIngrediente(rs.getString("nome"));
+                        ingredientesR.add(rs.getString("nome"));
                     }
                     pstmt.close();
                 }
@@ -156,19 +157,19 @@ public class Receitas {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+        
+        return ingredientesR;
     }
 
     @WebMethod
-    public ArrayList<Receita> verTodasAsReceitas() {
-        ArrayList<Receita> receitas = new ArrayList<Receita>();
+    public ArrayList<String> verTodasAsReceitas() {
+        ArrayList<String> receitas = new ArrayList<String>();
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
-                PreparedStatement pstmt = c.prepareStatement("SELECT * FROM receitas;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                PreparedStatement pstmt = c.prepareStatement("SELECT * FROM receitas;");
                 ResultSet rs = pstmt.executeQuery();
                 while (rs.next()) {
-                    Receita temp = new Receita(rs.getString("nome"), rs.getString("instrucoes"));
-                    listarIngredientes(temp);
-                    receitas.add(temp);
+                    receitas.add(rs.getString("nome") + "-" + rs.getString("instrucoes"));
                 }
                 pstmt.close();
             }
