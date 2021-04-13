@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -14,14 +15,26 @@ public class FormIngredients extends javax.swing.JFrame {
     private DefaultListModel lista = new DefaultListModel();
     ArrayList<String> ingredientes = t.retornaIngrediente();
 
-    public FormIngredients() {
+    private FormMain fm;
+
+    public FormIngredients(FormMain fm) {
         setTitle("Ingredientes");
         initComponents();
+        this.fm = fm;
+
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                
+                fm.refreshIngredientes();
+                
+                fm.setVisible(true);
+            }
+        });
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        for (int i = 0; i < ingredientes.size(); i++) {
-            lista.addElement(ingredientes.get(i));
-            jl_listaIngredientes.setModel(lista);
-        }
+
+        refreshIngredientes();
         jl_listaIngredientes.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -32,6 +45,26 @@ public class FormIngredients extends javax.swing.JFrame {
             }
 
         });
+    }
+    
+    private void refreshIngredientes(){
+        lista.clear();
+        ingredientes = t.retornaIngrediente();
+        for (int i = 0; i < ingredientes.size(); i++) {
+            lista.addElement(ingredientes.get(i));
+            jl_listaIngredientes.setModel(lista);
+        }
+    }
+    
+    private void limparAviso(){
+        Timer t = new Timer(1000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    jl_aviso.setText("");
+                }
+            });
+            t.setRepeats(false);
+            t.start();
     }
 
     @SuppressWarnings("unchecked")
@@ -124,31 +157,12 @@ public class FormIngredients extends javax.swing.JFrame {
             t.adicionarIngrediente(this.jtf_nomeIngrediente.getText());
             jl_aviso.setText("Ingrediente adicionado!");
 
-            lista.clear();
-            ingredientes = t.retornaIngrediente();
-            for (int i = 0; i < ingredientes.size(); i++) {
-                lista.addElement(ingredientes.get(i));
-                jl_listaIngredientes.setModel(lista);
-            }
-            Timer t = new Timer(1000, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    jl_aviso.setText(null);
-                }
-            });
-            t.setRepeats(false);
-            t.start();
+            refreshIngredientes();
+            limparAviso();
             this.jtf_nomeIngrediente.setText("");
         } else {
             jl_aviso.setText("Erro ao adicionar o ingrediente, tente novamente..");
-            Timer t = new Timer(1000, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    jl_aviso.setText(null);
-                }
-            });
-            t.setRepeats(false);
-            t.start();
+            limparAviso();
         }
     }//GEN-LAST:event_jb_adicionarActionPerformed
 
@@ -156,32 +170,14 @@ public class FormIngredients extends javax.swing.JFrame {
         if (this.jtf_nomeIngrediente.getText().length() != 0) {
             //t.removerIngrediente(this.jtf_nomeIngrediente.getText());
             jl_aviso.setText(t.removerIngrediente(jtf_nomeIngrediente.getText()));
-            lista.clear();
-            ingredientes = t.retornaIngrediente();
-            for (int i = 0; i < ingredientes.size(); i++) {
-                lista.addElement(ingredientes.get(i));
-                jl_listaIngredientes.setModel(lista);
-            }
 
-            Timer t = new Timer(1000, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    jl_aviso.setText("");
-                }
-            });
-            t.setRepeats(false);
-            t.start();
+            refreshIngredientes();
+
+            limparAviso();
             this.jtf_nomeIngrediente.setText("");
         } else {
             jl_aviso.setText("Erro ao remover o ingrediente, tente novamente..");
-            Timer t = new Timer(1000, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    jl_aviso.setText("");
-                }
-            });
-            t.setRepeats(false);
-            t.start();
+            
         }
     }//GEN-LAST:event_jb_removerActionPerformed
 
@@ -213,7 +209,7 @@ public class FormIngredients extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new FormIngredients().setVisible(true);
+                //new FormIngredients().setVisible(true);
             }
         });
     }

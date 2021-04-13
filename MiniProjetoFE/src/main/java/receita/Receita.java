@@ -14,8 +14,8 @@ import java.util.ArrayList;
 public class Receita {
 
     private ArrayList<String> ingredientes;
-    private final String nome;
-    private final String instrucoes;
+    private String nome="";
+    private String instrucoes="";
 
     public Receita(String nome, String instrucoes) {
         this.nome = nome;

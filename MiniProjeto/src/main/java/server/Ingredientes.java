@@ -23,6 +23,9 @@ public class Ingredientes {
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
                 System.out.println("Base dados conetada, estou a adicionar...");
+                
+                
+                
                 createTableQuery = "INSERT INTO ingredientes(nome) VALUES(?)";
                 PreparedStatement stmt = c.prepareStatement(createTableQuery);
                 stmt.setString(1, nome);

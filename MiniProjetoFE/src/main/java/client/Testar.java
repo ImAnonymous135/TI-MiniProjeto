@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,6 +24,7 @@ import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
+import receita.Receita;
 
 public class Testar {
 
@@ -66,7 +68,7 @@ public class Testar {
             //Adiciona um valor ao subelemento criado
             arg0.addTextNode(nome);
             //Identificação do Endpoint
-            ep = new URL(String.format("http://localhost:9999/ingredientes"));
+            ep = new URL(String.format("http://localhost:9999/ingredients"));
             //Criar um objeto SOAPConnectionFactory para instanciar uma ligação
             scf = SOAPConnectionFactory.newInstance();
             //Criao objeto para estabelecer a ligação
@@ -86,7 +88,7 @@ public class Testar {
             //Acede ao elemento seguinte
             sbe = (SOAPBodyElement) it.next();
             //Escreve o valor
-            System.out.println("Valor: " + sbe.getTextContent());
+            //System.out.println("Valor: " + sbe.getTextContent());
         } catch (Exception e) {
             e.getMessage();
         }
@@ -107,7 +109,7 @@ public class Testar {
             // Associação do objeto QName ao elemento Body
             be = sb.addBodyElement(bodyName);
             // Identificação do Endpoint
-            ep = new URL(String.format("http://127.0.0.1:9999/ingredientes"));
+            ep = new URL(String.format("http://127.0.0.1:9999/ingredients"));
             // Criar um objeto SOAPConnec tionFactory para instanciar uma ligação
             scf = SOAPConnectionFactory.newInstance();
             // Cria o objeto para estabeleceraligação
@@ -128,9 +130,9 @@ public class Testar {
             // Acede ao elemento seguinte
             
             while ((sbe = (SOAPBodyElement) it.next()) != null) {
-                System.out.println(sbe.getTextContent());
+                //System.out.println(sbe.getTextContent());
                 ingredientes.add(sbe.getTextContent());
-                System.out.println(ingredientes);
+                //System.out.println(ingredientes);
             }
 
         } catch (Exception e) {
@@ -164,7 +166,7 @@ public class Testar {
             //Adiciona um valor ao subelemento criado
             arg0.addTextNode(nome);
             //Identificação do Endpoint
-            URL ep = new URL(String.format("http://localhost:9999/ingredientes"));
+            URL ep = new URL(String.format("http://localhost:9999/ingredients"));
             //Criar um objeto SOAPConnectionFactory para instanciar uma ligação
             SOAPConnectionFactory scf = SOAPConnectionFactory.newInstance();
             //Criao objeto para estabelecer a ligação
@@ -251,9 +253,8 @@ public class Testar {
         }
     }
 
-    public String[] retornaReceita() {
-        String[] receitas = null;
-        int i = 0;
+    public ArrayList<Receita> retornaReceita() {
+       ArrayList<Receita> receitas = new ArrayList<Receita>();
         try {
             // Tem que se criar uma nova mensagem sempre que usamos um metodo diferente
             mf = MessageFactory.newInstance();
@@ -286,18 +287,16 @@ public class Testar {
             // Obtém os subelementos do elemento el
             it = el.getChildElements();
             // Acede ao elemento seguinte
-
-            while ((sbe = (SOAPBodyElement) it.next()) != null) {
-                i++;
-            }
-            System.out.println("Tamanho:" + i);
-            receitas = new String[i];
             it = el.getChildElements();
+            
             while ((sbe = (SOAPBodyElement) it.next()) != null) {
-                System.out.println(sbe.getTextContent());
-                receitas[i] = sbe.getTextContent();
-                System.out.println(receitas[i]);
-                i++;
+                System.out.println("Receitas tt:" + sbe.getTextContent());
+                
+                String nome = sbe.getTextContent();
+                String[] newNome = nome.split("-");
+                System.out.println("Novo nome: "+newNome[0]);
+                System.out.println("Novo nome: "+newNome[1]);
+                receitas.add(new Receita(newNome[0], newNome[1]));
             }
 
         } catch (Exception e) {
