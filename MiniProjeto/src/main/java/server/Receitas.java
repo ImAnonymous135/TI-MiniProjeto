@@ -33,11 +33,8 @@ public class Receitas {
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
                 System.out.println("Base dados conetada!");
-<<<<<<< HEAD
                 createTableQuery = "INSERT INTO ingredientes(nome) VALUES (?);";
-=======
-                createTableQuery = "INSERT INTO ingredientes(nome, instrucoes) VALUES (?,?);";
->>>>>>> 474a32f90914a1a03c7dc13f5966661e1ad225e9
+
                 PreparedStatement stmt = c.prepareStatement(createTableQuery);
                 stmt.setString(1, nomeReceitas);
                 stmt.setString(2, instrucoes);
@@ -169,15 +166,9 @@ public class Receitas {
                 PreparedStatement pstmt = c.prepareStatement("SELECT * FROM receitas;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 ResultSet rs = pstmt.executeQuery();
                 while (rs.next()) {
-<<<<<<< HEAD
                     Receita temp = new Receita(rs.getString("nome"), rs.getString("instrucoes"));
                     listarIngredientes(temp);
                     receitas.add(temp);
-=======
-                    ingredientes[i] = rs.getString("nome");
-                    ingredientes[i] += rs.getString("instrucoes");
-                    i++;
->>>>>>> 474a32f90914a1a03c7dc13f5966661e1ad225e9
                 }
                 pstmt.close();
             }
