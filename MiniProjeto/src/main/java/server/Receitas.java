@@ -76,7 +76,7 @@ public class Receitas {
     }
 
     @WebMethod
-    public String adicionarIngrediente(@WebParam(name = "receita") String receita,@WebParam(name = "ingrediente") String ingrediente){
+    public String adicionarIngredienteR(@WebParam(name = "receita") String receita, @WebParam(name = "ingrediente") String ingrediente){
         int id, id_R;
         try{
             if((c = bd.conectarPostsgresql()) != null){
@@ -105,7 +105,7 @@ public class Receitas {
     }
 
     @WebMethod
-    public String removerIngrediente(@WebParam(name = "receita") String receita,@WebParam(name = "ingrediente") String ingrediente){
+    public String removerIngredienteR(@WebParam(name = "nomeReceita") String nomeReceita,@WebParam(name = "ingrediente") String ingrediente){
         int id, id_R;
         try{
             if((c = bd.conectarPostsgresql()) != null){
@@ -115,7 +115,7 @@ public class Receitas {
                 if(rs.next()){
                     id = rs.getInt("id");
                     PreparedStatement psmt_R = c.prepareStatement("SELECT id FROM receitas WHERE nome = ?");
-                    psmt_R.setString(1, receita);
+                    psmt_R.setString(1, nomeReceita);
                     ResultSet rs_R = psmt_R.executeQuery();
                     if(rs_R.next()){
                         id_R = rs_R.getInt("id");
