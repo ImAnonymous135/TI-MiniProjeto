@@ -22,22 +22,46 @@ public class Ingredientes {
         String mensagem = "";
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
-                System.out.println("Base dados conetada, estou a adicionar...");
                 PreparedStatement pstmt = c.prepareStatement("Select nome FROM ingredientes WHERE nome ilike ?");
                 pstmt.setString(1, nome);
-                System.out.println("1");
                 ResultSet rs = pstmt.executeQuery();
-                System.out.println("2");
-                if(rs.next()){
-                    System.out.println("3");
-                    return mensagem = "Ja existe este ingrediente, adicione outro!";
+                if (rs.next()) {
+                    mensagem = "Ja existe este ingrediente, adicione outro!";
                 } else {
                     System.out.println("4");
                     createTableQuery = "INSERT INTO ingredientes(nome) VALUES(?)";
                     PreparedStatement stmt = c.prepareStatement(createTableQuery);
                     stmt.setString(1, nome);
                     stmt.execute();
-                    mensagem = "Inserido com sucesso o ingrediente: " + nome;
+                    mensagem = "Ingrediente adicionado com sucesso!";
+                    stmt.close();
+                }
+            } else {
+                mensagem = "Base dados desligada, em primeiro lugar ligue-a!";
+            }
+        } catch (Exception e) {
+            mensagem = "Erro:" + e.getMessage();
+        }
+        return mensagem;
+    }
+
+    @WebMethod
+    public String editarIngrediente(@WebParam(name = "nome") String nome, @WebParam(name = "novoNome") String novoNome) {
+        String mensagem = "";
+        try {
+            if ((c = bd.conectarPostsgresql()) != null) {
+                System.out.println("Base dados conetada, estou a adicionar...");
+                PreparedStatement pstmt = c.prepareStatement("Select nome FROM ingredientes WHERE nome ilike ?");
+                pstmt.setString(1, novoNome);
+                ResultSet rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    mensagem = "Este ingrediente já existe, adicione outro!";
+                } else {
+                    createTableQuery = "Update ingredientes SET nome = ? where nome ilike '" + nome + "' ;";
+                    PreparedStatement stmt = c.prepareStatement(createTableQuery);
+                    stmt.setString(1, novoNome);
+                    stmt.execute();
+                    mensagem = "Ingrediente alterado com sucesso!";
                     stmt.close();
                 }
 
@@ -63,7 +87,7 @@ public class Ingredientes {
                 if (r == 0) {
                     mensagem = "Erro ao remover, tente novamente...";
                 } else if (r == 1) {
-                    mensagem = "Removido com sucesso!";
+                    mensagem = "Ingrediente removido com sucesso!";
                 }
                 stmt.close();
                 c.close();

@@ -1,5 +1,7 @@
 package client;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -8,6 +10,7 @@ import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import static javax.swing.JOptionPane.showMessageDialog;
 
 public class FormIngredients extends javax.swing.JFrame {
 
@@ -22,10 +25,15 @@ public class FormIngredients extends javax.swing.JFrame {
         initComponents();
         this.fm = fm;
 
+        Dimension tamanho = new Dimension(420, 240);
+        setSize(tamanho);
+        setLayout(new BorderLayout());
+        setPreferredSize(tamanho);
+        setLocationRelativeTo(null);
+
         this.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                
                 fm.refreshIngredientes();
                 fm.setVisible(true);
             }
@@ -34,7 +42,7 @@ public class FormIngredients extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         refreshIngredientes();
-        jl_listaIngredientes.addListSelectionListener(new ListSelectionListener() {
+        /*jl_listaIngredientes.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 System.out.println(e);
@@ -43,10 +51,10 @@ public class FormIngredients extends javax.swing.JFrame {
                 }
             }
 
-        });
+        });*/
     }
-    
-    private void refreshIngredientes(){
+
+    private void refreshIngredientes() {
         lista.clear();
         ingredientes = t.retornaIngrediente();
         for (int i = 0; i < ingredientes.size(); i++) {
@@ -54,16 +62,16 @@ public class FormIngredients extends javax.swing.JFrame {
             jl_listaIngredientes.setModel(lista);
         }
     }
-    
-    private void limparAviso(){
+
+    private void limparAviso() {
         Timer t = new Timer(1000, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    jl_aviso.setText("");
-                }
-            });
-            t.setRepeats(false);
-            t.start();
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jl_aviso.setText("");
+            }
+        });
+        t.setRepeats(false);
+        t.start();
     }
 
     @SuppressWarnings("unchecked")
@@ -78,6 +86,7 @@ public class FormIngredients extends javax.swing.JFrame {
         jb_adicionar = new javax.swing.JButton();
         jb_remover = new javax.swing.JButton();
         jl_aviso = new javax.swing.JLabel();
+        jb_editar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -101,6 +110,15 @@ public class FormIngredients extends javax.swing.JFrame {
             }
         });
 
+        jl_aviso.setFont(new java.awt.Font("Dialog", 1, 11)); // NOI18N
+
+        jb_editar.setText("Editar");
+        jb_editar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jb_editarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -108,32 +126,37 @@ public class FormIngredients extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jl_aviso, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jtf_nomeIngrediente, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jb_adicionar, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jb_remover, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(jtf_nomeIngrediente, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(jb_adicionar)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jb_editar)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jb_remover)))
+                                .addGap(0, 15, Short.MAX_VALUE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jl_aviso, javax.swing.GroupLayout.PREFERRED_SIZE, 391, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(15, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -141,10 +164,11 @@ public class FormIngredients extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jb_adicionar)
-                            .addComponent(jb_remover))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jl_aviso, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                            .addComponent(jb_remover)
+                            .addComponent(jb_editar))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addComponent(jl_aviso, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(15, 15, 15))
         );
 
         pack();
@@ -153,31 +177,45 @@ public class FormIngredients extends javax.swing.JFrame {
     private void jb_adicionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_adicionarActionPerformed
         if (this.jtf_nomeIngrediente.getText().length() != 0) {
             System.out.println(this.jtf_nomeIngrediente.getText());
-            t.adicionarIngrediente(this.jtf_nomeIngrediente.getText());
+            jl_aviso.setText(t.adicionarIngrediente(this.jtf_nomeIngrediente.getText()));
 
             refreshIngredientes();
             limparAviso();
             this.jtf_nomeIngrediente.setText("");
         } else {
-            jl_aviso.setText("Erro ao adicionar o ingrediente, tente novamente..");
+            jl_aviso.setText("Para adicionar, escreva o nome do ingrediente!");
             limparAviso();
         }
     }//GEN-LAST:event_jb_adicionarActionPerformed
 
     private void jb_removerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_removerActionPerformed
-        if (this.jtf_nomeIngrediente.getText().length() != 0) {
+        if (jl_listaIngredientes.isSelectionEmpty()) {
+            jl_aviso.setText("Por favor escolha um ingrediente!");
+        } else {
             //t.removerIngrediente(this.jtf_nomeIngrediente.getText());
-            jl_aviso.setText(t.removerIngrediente(jtf_nomeIngrediente.getText()));
-
+            jl_aviso.setText(t.removerIngrediente(jl_listaIngredientes.getSelectedValue().toString()));
+            //jl_aviso.setText(t.removerIngrediente(jtf_nomeIngrediente.getText()));
             refreshIngredientes();
-
             limparAviso();
             this.jtf_nomeIngrediente.setText("");
-        } else {
-            jl_aviso.setText("Erro ao remover o ingrediente, tente novamente..");
-            
         }
     }//GEN-LAST:event_jb_removerActionPerformed
+
+    private void jb_editarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_editarActionPerformed
+
+        if (jl_listaIngredientes.isSelectionEmpty()) {
+            jl_aviso.setText("Por favor escolha um ingrediente!");
+        } else {
+            System.out.println("3");
+            jl_aviso.setText(t.editarIngrediente(jl_listaIngredientes.getSelectedValue().toString(), this.jtf_nomeIngrediente.getText()));
+
+            refreshIngredientes();
+            limparAviso();
+            this.jtf_nomeIngrediente.setText("");
+        }
+
+
+    }//GEN-LAST:event_jb_editarActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -217,6 +255,7 @@ public class FormIngredients extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton jb_adicionar;
+    private javax.swing.JButton jb_editar;
     private javax.swing.JButton jb_remover;
     private javax.swing.JLabel jl_aviso;
     private javax.swing.JList<String> jl_listaIngredientes;

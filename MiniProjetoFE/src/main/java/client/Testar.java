@@ -44,7 +44,8 @@ public class Testar {
     SOAPBodyElement sbe;
 
     // Ingredientes
-    public void adicionarIngrediente(String nome) {
+    public String adicionarIngrediente(String nome) {
+        String mensagem="";
         try {
             //Instanciação do objeto que permiteacriação de mensagens
             mf = MessageFactory.newInstance();
@@ -89,9 +90,72 @@ public class Testar {
             sbe = (SOAPBodyElement) it.next();
             //Escreve o valor
             //System.out.println("Valor: " + sbe.getTextContent());
+            mensagem = sbe.getTextContent();
         } catch (Exception e) {
             e.getMessage();
         }
+        return mensagem;
+    }
+    
+    public String editarIngrediente(String nome, String novoNome) {
+        String mensagem="";
+        try {
+            //Instanciação do objeto que permiteacriação de mensagens
+            mf = MessageFactory.newInstance();
+
+            //Cria a mensagem SOAP com Header e Body
+            sm = mf.createMessage();
+            //Obtenção da instância do Header
+            sh = sm.getSOAPHeader();
+            //Obtenção da instância do Body
+            sb = sm.getSOAPBody();
+            //Remove o header da mensagem
+            sh.detachNode();
+            //Namespace URI , localpart , namespace prefix
+            bodyName = new QName("http://server/", "editarIngrediente", "nome");//o m é o que envia do genero <m></m>
+            //Associação do obje to QName ao elemento Body
+            be = sb.addBodyElement(bodyName);
+            //Criação de um objeto do tipo QName
+            QName name = new QName("nome");
+            //Adiciona um novo subelemento ao elemento Body
+            SOAPElement arg0 = be.addChildElement(name);
+            //Adiciona um valor ao subelemento criado
+            arg0.addTextNode(nome);
+            
+            //Criação de um objeto do tipo QName
+            QName name1 = new QName("novoNome");
+            //Adiciona um novo subelemento ao elemento Body
+            SOAPElement arg1 = be.addChildElement(name1);
+            //Adiciona um valor ao subelemento criado
+            arg1.addTextNode(novoNome);
+            
+            //Identificação do Endpoint
+            ep = new URL(String.format("http://localhost:9999/ingredients"));
+            //Criar um objeto SOAPConnectionFactory para instanciar uma ligação
+            scf = SOAPConnectionFactory.newInstance();
+            //Criao objeto para estabelecer a ligação
+            sc = scf.createConnection();
+            //Realiza a invocação do serviço enviado a mensagem SOAP (sm) para o endpoint ( ep )
+            response = sc.call(sm, ep);
+            //Termina a ligação
+            sc.close();
+            //Obtém a referência para o elemento Body da resposta
+            respBody = response.getSOAPBody();
+            //Obtenção do iterador para percorrer os subelementos do elemento Body
+            it = respBody.getChildElements();
+            //Acede ao elemento seguinte
+            el = (SOAPBodyElement) it.next();
+            //Obtém os subelementos do elemento el
+            it = el.getChildElements();
+            //Acede ao elemento seguinte
+            sbe = (SOAPBodyElement) it.next();
+            //Escreve o valor
+            //System.out.println("Valor: " + sbe.getTextContent());
+            mensagem = sbe.getTextContent();
+        } catch (Exception e) {
+            e.getMessage();
+        }
+        return mensagem;
     }
 
     public ArrayList<String> retornaIngrediente() {

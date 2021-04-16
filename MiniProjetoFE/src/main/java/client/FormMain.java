@@ -5,6 +5,8 @@
  */
 package client;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 import receita.Receita;
@@ -32,6 +34,12 @@ public class FormMain extends javax.swing.JFrame {
         setTitle("Receitas");
         initComponents();
         System.out.println("RECEITAS: " + receitas);
+        
+        Dimension tamanho = new Dimension(705, 305);
+        setSize(tamanho);
+        setLayout(new BorderLayout());
+        setPreferredSize(tamanho);
+        setLocationRelativeTo(null);
 
         refreshIngredientes();
 
