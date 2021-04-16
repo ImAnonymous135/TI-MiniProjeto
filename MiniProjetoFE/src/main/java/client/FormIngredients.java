@@ -27,7 +27,6 @@ public class FormIngredients extends javax.swing.JFrame {
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
                 
                 fm.refreshIngredientes();
-                
                 fm.setVisible(true);
             }
         });
@@ -155,7 +154,6 @@ public class FormIngredients extends javax.swing.JFrame {
         if (this.jtf_nomeIngrediente.getText().length() != 0) {
             System.out.println(this.jtf_nomeIngrediente.getText());
             t.adicionarIngrediente(this.jtf_nomeIngrediente.getText());
-            jl_aviso.setText("Ingrediente adicionado!");
 
             refreshIngredientes();
             limparAviso();

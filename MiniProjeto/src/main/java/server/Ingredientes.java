@@ -23,12 +23,16 @@ public class Ingredientes {
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
                 System.out.println("Base dados conetada, estou a adicionar...");
-                PreparedStatement pstmt = c.prepareStatement("SELECT id FROM ingredientes WHERE nome = ?");
+                PreparedStatement pstmt = c.prepareStatement("Select nome FROM ingredientes WHERE nome ilike ?");
                 pstmt.setString(1, nome);
+                System.out.println("1");
                 ResultSet rs = pstmt.executeQuery();
+                System.out.println("2");
                 if(rs.next()){
-                    mensagem = "J� existe esse nome!";
+                    System.out.println("3");
+                    return mensagem = "Ja existe este ingrediente, adicione outro!";
                 } else {
+                    System.out.println("4");
                     createTableQuery = "INSERT INTO ingredientes(nome) VALUES(?)";
                     PreparedStatement stmt = c.prepareStatement(createTableQuery);
                     stmt.setString(1, nome);
