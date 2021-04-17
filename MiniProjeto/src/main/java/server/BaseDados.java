@@ -22,8 +22,9 @@ public class BaseDados {
     @WebMethod
     public Connection conectarPostsgresql() {
         try {
+            System.out.println("Base de dadosa");
             Class.forName("org.postgresql.Driver");
-            c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/miniProjeto_TI", "postgres", "rafael");
+            c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/projetoReceitas", "postgres", "qwerty");
         } catch (Exception ex) {
             Logger.getLogger(BaseDados.class.getName()).log(Level.SEVERE, null, ex);
         }

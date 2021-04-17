@@ -63,10 +63,11 @@ public class Receitas {
     @WebMethod
     public String removerReceita(@WebParam(name = "nomeReceita") String nomeReceita) {
         String mensagem = "";
+        System.out.println("nome da receita"+nomeReceita);
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
                 stmt = c.createStatement();
-                String sql = "DELETE FROM receitas WHERE nome ilike '" + nomeReceita + "'";
+                String sql = "DELETE FROM receitas WHERE nome ilike '"+ nomeReceita + "'";
                 int i = stmt.executeUpdate(sql);
                 if (i == 0) {
                     mensagem = "Erro ao remover!";
@@ -143,7 +144,7 @@ public class Receitas {
     }
 
     @WebMethod
-    public ArrayList<String> listarIngredientes(String receita){
+    public ArrayList<String> listarIngredientes(@WebParam(name = "receita")String receita){
         int id_R;
         ArrayList<String> ingredientesR = new ArrayList<String>();
 
