@@ -14,6 +14,7 @@ import java.io.*;
 import java.util.List;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.Position;
 
 /**
  *
@@ -38,7 +39,6 @@ public class FormMain extends javax.swing.JFrame {
     public FormMain() {
         setTitle("Receitas");
         initComponents();
-        System.out.println("RECEITAS: " + receitas.get(0).getIngredientes().toString());
 
         Dimension tamanho = new Dimension(705, 305);
         setSize(tamanho);
@@ -50,7 +50,6 @@ public class FormMain extends javax.swing.JFrame {
         jButton2.setEnabled(false);
 
         for (Receita temp : receitas) {
-            System.out.println("Receitas iii:" + temp.getNome());
             lista2.addElement(temp.getNome());
             jl_receitas.setModel(lista2);
         }
@@ -61,16 +60,21 @@ public class FormMain extends javax.swing.JFrame {
                 if (e.getValueIsAdjusting()) {
                     int index = jl_receitas.getSelectedIndex();
                     selectedReceita = receitas.get(index);
+                    int[] ingredientsIndex = new int[selectedReceita.getIngredientes().size()];
                     jta_instrucoes.setText(selectedReceita.getInstrucoes());
-                    jtf_nome.setText(selectedReceita.getNome());
-                    lista.clear();
+                    int i = 0;
                     for (String ingrediente : selectedReceita.getIngredientes()) {
-                        lista.addElement(ingrediente);
+                        int idx = jl_ingredientes.getNextMatch(ingrediente, 0, Position.Bias.Forward);
+                        ingredientsIndex[i] = idx;
+                        i++;
                     }
-                    jl_ingredientes.setModel(lista);
+                    jtf_nome.setText(selectedReceita.getNome());
+                    
+                    jl_ingredientes.setSelectedIndices(ingredientsIndex);
                     jButton1.setText("Atualizar");
                     jButton2.setEnabled(true);
                     addState = false;
+                    selectedIngredients = jl_ingredientes.getSelectedValuesList();
                 }
             }
         });
@@ -278,10 +282,16 @@ public class FormMain extends javax.swing.JFrame {
                         novaReceita.addIngrediente(selectedIngredient);
                     }
                 }
-                System.out.println(novaReceita.getIngredientes());
                 t.adicionarReceita(novaReceita);
             } else {
                 //Update
+                Receita novaReceita = new Receita(jtf_nome.getText(), jta_instrucoes.getText());
+                if (!selectedIngredients.isEmpty()) {
+                    for (String selectedIngredient : selectedIngredients) {
+                        novaReceita.addIngrediente(selectedIngredient);
+                    }
+                }
+                t.editarReceita(novaReceita, selectedReceita);
             }
             clearFields();
             refreshReceitas();
@@ -291,7 +301,6 @@ public class FormMain extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         //Eliminar
-        System.out.println("Selected receita: " + selectedReceita.getNome());
         t.eliminarReceita(selectedReceita);
         refreshReceitas();
     }//GEN-LAST:event_jButton2ActionPerformed
