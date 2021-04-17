@@ -115,6 +115,29 @@ public class Receitas {
     }
 
     @WebMethod
+    public String atualizarInstrucoes(@WebParam(name = "nomeReceita") String nomeReceita, @WebParam(name = "instrucoes") String intrucoes){
+        int id_R;
+        try {
+            if ((c = bd.conectarPostsgresql()) != null) {
+                PreparedStatement psmt = c.prepareStatement("SELECT id FROM receitas WHERE nome = ?");
+                psmt.setString(1, nomeReceita);
+                ResultSet rs = psmt.executeQuery();
+                if (rs.next()) {
+                    id_R = rs.getInt("id");
+                    PreparedStatement psmt_R = c.prepareStatement("UPDATE receitas SET instrucoes = ? WHERE id = ? ");
+                    psmt_R.setString(1, intrucoes);
+                    psmt_R.setInt(2, id_R);
+                    psmt_R.execute();
+                    return "Atualizado com sucesso!";
+                }
+            }
+            return "Base de dados desligada!";
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    @WebMethod
     public String removerIngredienteR(@WebParam(name = "nomeReceita") String nomeReceita, @WebParam(name = "ingrediente") String ingrediente) {
         int id, id_R;
         try {
