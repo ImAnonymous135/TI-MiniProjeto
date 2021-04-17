@@ -45,7 +45,7 @@ public class Testar {
 
     // Ingredientes
     public String adicionarIngrediente(String nome) {
-        String mensagem="";
+        String mensagem = "";
         try {
             //Instanciação do objeto que permiteacriação de mensagens
             mf = MessageFactory.newInstance();
@@ -96,9 +96,9 @@ public class Testar {
         }
         return mensagem;
     }
-    
+
     public String editarIngrediente(String nome, String novoNome) {
-        String mensagem="";
+        String mensagem = "";
         try {
             //Instanciação do objeto que permiteacriação de mensagens
             mf = MessageFactory.newInstance();
@@ -121,14 +121,14 @@ public class Testar {
             SOAPElement arg0 = be.addChildElement(name);
             //Adiciona um valor ao subelemento criado
             arg0.addTextNode(nome);
-            
+
             //Criação de um objeto do tipo QName
             QName name1 = new QName("novoNome");
             //Adiciona um novo subelemento ao elemento Body
             SOAPElement arg1 = be.addChildElement(name1);
             //Adiciona um valor ao subelemento criado
             arg1.addTextNode(novoNome);
-            
+
             //Identificação do Endpoint
             ep = new URL(String.format("http://localhost:9999/ingredients"));
             //Criar um objeto SOAPConnectionFactory para instanciar uma ligação
@@ -192,7 +192,7 @@ public class Testar {
             // Obtém os subelementos do elemento el
             it = el.getChildElements();
             // Acede ao elemento seguinte
-            
+
             while ((sbe = (SOAPBodyElement) it.next()) != null) {
                 //System.out.println(sbe.getTextContent());
                 ingredientes.add(sbe.getTextContent());
@@ -206,7 +206,7 @@ public class Testar {
     }
 
     public String removerIngrediente(String nome) {
-        String mensagem="";
+        String mensagem = "";
         try {
             //Instanciação do objeto que permiteacriação de mensagens
             MessageFactory mf = MessageFactory.newInstance();
@@ -259,7 +259,7 @@ public class Testar {
     }
 
     // RECEITAS
-    public void adicionarReceita(String nome, String instrucoes) {
+    public void editarReceita(String nome, String instrucoes) {
         try {
             //Instanciação do objeto que permiteacriação de mensagens
             MessageFactory mf = MessageFactory.newInstance();
@@ -277,7 +277,7 @@ public class Testar {
             //Associação do obje to QName ao elemento Body
             SOAPBodyElement be = sb.addBodyElement(bodyName);
             //Criação de um objeto do tipo QName
-            QName name = new QName("nome");
+            QName name = new QName("nomeReceitas");
             //Adiciona um novo subelemento ao elemento Body
             SOAPElement arg0 = be.addChildElement(name);
             //Adiciona um valor ao subelemento criado
@@ -316,9 +316,176 @@ public class Testar {
             e.getMessage();
         }
     }
+    
+    public void adicionarReceita(Receita receita) {
+        try {
+            //Instanciação do objeto que permiteacriação de mensagens
+            MessageFactory mf = MessageFactory.newInstance();
 
-    public ArrayList<Receita> retornaReceita() {
-       ArrayList<Receita> receitas = new ArrayList<Receita>();
+            //Cria a mensagem SOAP com Header e Body
+            SOAPMessage sm = mf.createMessage();
+            //Obtenção da instância do Header
+            SOAPHeader sh = sm.getSOAPHeader();
+            //Obtenção da instância do Body
+            SOAPBody sb = sm.getSOAPBody();
+            //Remove o header da mensagem
+            sh.detachNode();
+            //Namespace URI , localpart , namespace prefix
+            QName bodyName = new QName("http://server/", "adicionarReceitas", "nome");//o m é o que envia do genero <m></m>
+            //Associação do obje to QName ao elemento Body
+            SOAPBodyElement be = sb.addBodyElement(bodyName);
+            //Criação de um objeto do tipo QName
+            QName name = new QName("nomeReceitas");
+            //Adiciona um novo subelemento ao elemento Body
+            SOAPElement arg0 = be.addChildElement(name);
+            //Adiciona um valor ao subelemento criado
+            arg0.addTextNode(receita.getNome());
+
+            //Criação de um objeto do tipo QName
+            QName name1 = new QName("instrucoes");
+            //Adiciona um novo subelemento ao elemento Body
+            SOAPElement arg1 = be.addChildElement(name1);
+            //Adiciona um valor ao subelemento criado
+            arg1.addTextNode(receita.getInstrucoes());
+
+            //Identificação do Endpoint
+            URL ep = new URL(String.format("http://localhost:9999/receitas"));
+            //Criar um objeto SOAPConnectionFactory para instanciar uma ligação
+            SOAPConnectionFactory scf = SOAPConnectionFactory.newInstance();
+            //Criao objeto para estabelecer a ligação
+            SOAPConnection sc = scf.createConnection();
+            //Realiza a invocação do serviço enviado a mensagem SOAP (sm) para o endpoint ( ep )
+            SOAPMessage response = sc.call(sm, ep);
+            //Termina a ligação
+            sc.close();
+            //Obtém a referência para o elemento Body da resposta
+            SOAPBody respBody = response.getSOAPBody();
+            //Obtenção do iterador para percorrer os subelementos do elemento Body
+            Iterator it = respBody.getChildElements();
+            //Acede ao elemento seguinte
+            SOAPBodyElement el = (SOAPBodyElement) it.next();
+            //Obtém os subelementos do elemento el
+            it = el.getChildElements();
+            //Acede ao elemento seguinte
+            SOAPBodyElement sbe = (SOAPBodyElement) it.next();
+            //Escreve o valor
+            System.out.println("Valor: " + sbe.getTextContent());
+            for (String ingrediente : receita.getIngredientes()) {
+                adicionarIngredienteR(receita.getNome(), ingrediente);
+            }
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
+
+    private void adicionarIngredienteR(String receita, String ingrediente) {
+        try {
+            //Instanciação do objeto que permiteacriação de mensagens
+            MessageFactory mf = MessageFactory.newInstance();
+
+            //Cria a mensagem SOAP com Header e Body
+            SOAPMessage sm = mf.createMessage();
+            //Obtenção da instância do Header
+            SOAPHeader sh = sm.getSOAPHeader();
+            //Obtenção da instância do Body
+            SOAPBody sb = sm.getSOAPBody();
+            //Remove o header da mensagem
+            sh.detachNode();
+            //Namespace URI , localpart , namespace prefix
+            QName bodyName = new QName("http://server/", "adicionarIngredienteR", "nome");//o m é o que envia do genero <m></m>
+            //Associação do obje to QName ao elemento Body
+            SOAPBodyElement be = sb.addBodyElement(bodyName);
+            //Criação de um objeto do tipo QName
+            QName name = new QName("receita");
+            //Adiciona um novo subelemento ao elemento Body
+            SOAPElement arg0 = be.addChildElement(name);
+            //Adiciona um valor ao subelemento criado
+            arg0.addTextNode(receita);
+            QName name1 = new QName("ingrediente");
+            //Adiciona um novo subelemento ao elemento Body
+            SOAPElement arg1 = be.addChildElement(name1);
+            //Adiciona um valor ao subelemento criado
+            arg1.addTextNode(ingrediente);
+
+            //Identificação do Endpoint
+            URL ep = new URL(String.format("http://localhost:9999/receitas"));
+            //Criar um objeto SOAPConnectionFactory para instanciar uma ligação
+            SOAPConnectionFactory scf = SOAPConnectionFactory.newInstance();
+            //Criao objeto para estabelecer a ligação
+            SOAPConnection sc = scf.createConnection();
+            //Realiza a invocação do serviço enviado a mensagem SOAP (sm) para o endpoint ( ep )
+            SOAPMessage response = sc.call(sm, ep);
+            //Termina a ligação
+            sc.close();
+            //Obtém a referência para o elemento Body da resposta
+            SOAPBody respBody = response.getSOAPBody();
+            //Obtenção do iterador para percorrer os subelementos do elemento Body
+            Iterator it = respBody.getChildElements();
+            //Acede ao elemento seguinte
+            SOAPBodyElement el = (SOAPBodyElement) it.next();
+            //Obtém os subelementos do elemento el
+            it = el.getChildElements();
+            //Acede ao elemento seguinte
+            SOAPBodyElement sbe = (SOAPBodyElement) it.next();
+            //Escreve o valor
+            System.out.println("Valor: " + sbe.getTextContent());
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
+    
+    public void eliminarReceita(Receita receita) {
+        try {
+            //Instanciação do objeto que permiteacriação de mensagens
+            MessageFactory mf = MessageFactory.newInstance();
+
+            //Cria a mensagem SOAP com Header e Body
+            SOAPMessage sm = mf.createMessage();
+            //Obtenção da instância do Header
+            SOAPHeader sh = sm.getSOAPHeader();
+            //Obtenção da instância do Body
+            SOAPBody sb = sm.getSOAPBody();
+            //Remove o header da mensagem
+            sh.detachNode();
+            //Namespace URI , localpart , namespace prefix
+            QName bodyName = new QName("http://server/", "removerReceita", "nome");//o m é o que envia do genero <m></m>
+            //Associação do obje to QName ao elemento Body
+            SOAPBodyElement be = sb.addBodyElement(bodyName);
+            //Criação de um objeto do tipo QName
+            QName name = new QName("nomeReceita");
+            //Adiciona um novo subelemento ao elemento Body
+            SOAPElement arg0 = be.addChildElement(name);
+            //Adiciona um valor ao subelemento criado
+            arg0.addTextNode(receita.getNome());
+            //Identificação do Endpoint
+            URL ep = new URL(String.format("http://localhost:9999/receitas"));
+            //Criar um objeto SOAPConnectionFactory para instanciar uma ligação
+            SOAPConnectionFactory scf = SOAPConnectionFactory.newInstance();
+            //Criao objeto para estabelecer a ligação
+            SOAPConnection sc = scf.createConnection();
+            //Realiza a invocação do serviço enviado a mensagem SOAP (sm) para o endpoint ( ep )
+            SOAPMessage response = sc.call(sm, ep);
+            //Termina a ligação
+            sc.close();
+            //Obtém a referência para o elemento Body da resposta
+            SOAPBody respBody = response.getSOAPBody();
+            //Obtenção do iterador para percorrer os subelementos do elemento Body
+            Iterator it = respBody.getChildElements();
+            //Acede ao elemento seguinte
+            SOAPBodyElement el = (SOAPBodyElement) it.next();
+            //Obtém os subelementos do elemento el
+            it = el.getChildElements();
+            //Acede ao elemento seguinte
+            SOAPBodyElement sbe = (SOAPBodyElement) it.next();
+            //Escreve o valor
+            System.out.println("Valor: " + sbe.getTextContent());
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
+
+    private ArrayList<Receita> retornaReceita() {
+        ArrayList<Receita> receitas = new ArrayList<Receita>();
         try {
             // Tem que se criar uma nova mensagem sempre que usamos um metodo diferente
             mf = MessageFactory.newInstance();
@@ -352,19 +519,74 @@ public class Testar {
             it = el.getChildElements();
             // Acede ao elemento seguinte
             it = el.getChildElements();
-            
+
             while ((sbe = (SOAPBodyElement) it.next()) != null) {
                 System.out.println("Receitas tt:" + sbe.getTextContent());
-                
+
                 String nome = sbe.getTextContent();
                 String[] newNome = nome.split("-");
-                System.out.println("Novo nome: "+newNome[0]);
-                System.out.println("Novo nome: "+newNome[1]);
+                System.out.println("Novo nome: " + newNome[0]);
+                System.out.println("Novo nome: " + newNome[1]);
                 receitas.add(new Receita(newNome[0], newNome[1]));
             }
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
+        }
+        return receitas;
+    }
+
+    public ArrayList<Receita> retornaIngredienteR() {
+        ArrayList<Receita> receitas = retornaReceita();
+        for (Receita receita : receitas) {
+            try {
+                // Tem que se criar uma nova mensagem sempre que usamos um metodo diferente
+                mf = MessageFactory.newInstance();
+                sm = mf.createMessage();
+                //Obtenção da instância do Header
+                sh = sm.getSOAPHeader();
+                //Obtenção da instância do Body
+                sb = sm.getSOAPBody();
+                // Namespace URI, localpart, namespace prefix
+                bodyName = new QName("http://server/", "listarIngredientes", "m");
+                // Associação do objeto QName ao elemento Body
+                be = sb.addBodyElement(bodyName);
+                //Criação de um objeto do tipo QName
+                QName name1 = new QName("receita");
+                //Adiciona um novo subelemento ao elemento Body
+                SOAPElement arg1 = be.addChildElement(name1);
+                //Adiciona um valor ao subelemento criado
+                arg1.addTextNode(receita.getNome());
+                // Identificação do Endpoint
+                ep = new URL(String.format("http://127.0.0.1:9999/receitas"));
+                // Criar um objeto SOAPConnec tionFactory para instanciar uma ligação
+                scf = SOAPConnectionFactory.newInstance();
+                // Cria o objeto para estabeleceraligação
+                sc = scf.createConnection();
+                // Realiza a invocação do serviço enviado a mensagem SOAP (sm) para o endpoint ( ep )
+                response = sc.call(sm, ep);
+                // Termina a ligação
+                sc.close();
+                // Obtém a referência para o elemento Body da resposta
+                respBody = response.getSOAPBody();
+                // Obtenção do iterador para percorrer os subelementos do 
+                // elemento Body
+                it = respBody.getChildElements();
+                // Acede ao elemento seguinte
+                el = (SOAPBodyElement) it.next();
+                // Obtém os subelementos do elemento el
+                it = el.getChildElements();
+                // Acede ao elemento seguinte
+
+                while ((sbe = (SOAPBodyElement) it.next()) != null) {
+                    //System.out.println(sbe.getTextContent());
+                    receita.addIngrediente(sbe.getTextContent());
+                    //System.out.println(ingredientes);
+                }
+
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
         return receitas;
     }

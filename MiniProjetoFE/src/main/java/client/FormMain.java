@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 import receita.Receita;
 import java.io.*;
+import java.util.List;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  *
@@ -23,18 +26,20 @@ public class FormMain extends javax.swing.JFrame {
      */
     FormIngredients fi = new FormIngredients(this);
     Testar t = new Testar();
-
+    private boolean addState = true;
+    private Receita selectedReceita = null;
+    private List<String> selectedIngredients;
     private DefaultListModel lista = new DefaultListModel();
     ArrayList<String> ingredientes = t.retornaIngrediente();
 
     private DefaultListModel lista2 = new DefaultListModel();
-    ArrayList<Receita> receitas = t.retornaReceita();
+    ArrayList<Receita> receitas = t.retornaIngredienteR();
 
     public FormMain() {
         setTitle("Receitas");
         initComponents();
-        System.out.println("RECEITAS: " + receitas);
-        
+        System.out.println("RECEITAS: " + receitas.get(0).getIngredientes().toString());
+
         Dimension tamanho = new Dimension(705, 305);
         setSize(tamanho);
         setLayout(new BorderLayout());
@@ -42,6 +47,7 @@ public class FormMain extends javax.swing.JFrame {
         setLocationRelativeTo(null);
 
         refreshIngredientes();
+        jButton2.setEnabled(false);
 
         for (Receita temp : receitas) {
             System.out.println("Receitas iii:" + temp.getNome());
@@ -49,15 +55,58 @@ public class FormMain extends javax.swing.JFrame {
             jl_receitas.setModel(lista2);
         }
 
+        jl_receitas.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) {
+                    int index = jl_receitas.getSelectedIndex();
+                    selectedReceita = receitas.get(index);
+                    jta_instrucoes.setText(selectedReceita.getInstrucoes());
+                    jtf_nome.setText(selectedReceita.getNome());
+                    lista.clear();
+                    for (String ingrediente : selectedReceita.getIngredientes()) {
+                        lista.addElement(ingrediente);
+                    }
+                    jl_ingredientes.setModel(lista);
+                    jButton1.setText("Atualizar");
+                    jButton2.setEnabled(true);
+                    addState = false;
+                }
+            }
+        });
+
+        jl_ingredientes.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) {
+                    selectedIngredients = jl_ingredientes.getSelectedValuesList();
+                }
+            }
+        });
+
     }
-    
-    public void refreshIngredientes(){
+
+    public void refreshIngredientes() {
         lista.clear();
         ingredientes = t.retornaIngrediente();
         for (String temp : ingredientes) {
             lista.addElement(temp);
             jl_ingredientes.setModel(lista);
         }
+    }
+
+    public void refreshReceitas() {
+        lista2.clear();
+        receitas = t.retornaIngredienteR();
+        for (Receita temp : receitas) {
+            lista2.addElement(temp.getNome());
+            jl_receitas.setModel(lista2);
+        }
+    }
+    
+    private void clearFields() {
+        jta_instrucoes.setText("");
+        jtf_nome.setText("");
     }
 
     @SuppressWarnings("unchecked")
@@ -206,6 +255,10 @@ public class FormMain extends javax.swing.JFrame {
         this.jtf_nome.setText("");
         this.jl_receitas.clearSelection();
         this.jl_ingredientes.clearSelection();
+        refreshIngredientes();
+        jButton1.setText("Adicionar");
+        addState = true;
+        jButton2.setEnabled(false);
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -216,15 +269,31 @@ public class FormMain extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         //Adicionar
-        if (this.jta_instrucoes.getText().length() != 0
-                && this.jtf_nome.getText().length() != 0) {
-            t.adicionarReceita(this.jtf_nome.getText(), this.jta_instrucoes.getText());
+        if (this.jta_instrucoes.getText().length() != 0 && this.jtf_nome.getText().length() != 0) {
+            if (addState) {
+                //Add
+                Receita novaReceita = new Receita(jtf_nome.getText(), jta_instrucoes.getText());
+                if (!selectedIngredients.isEmpty()) {
+                    for (String selectedIngredient : selectedIngredients) {
+                        novaReceita.addIngrediente(selectedIngredient);
+                    }
+                }
+                System.out.println(novaReceita.getIngredientes());
+                t.adicionarReceita(novaReceita);
+            } else {
+                //Update
+            }
+            clearFields();
+            refreshReceitas();
+            refreshIngredientes();
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        //remover
-
+        //Eliminar
+        System.out.println("Selected receita: " + selectedReceita.getNome());
+        t.eliminarReceita(selectedReceita);
+        refreshReceitas();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
