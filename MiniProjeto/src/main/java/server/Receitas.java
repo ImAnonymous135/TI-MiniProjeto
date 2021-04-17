@@ -67,7 +67,7 @@ public class Receitas {
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
                 stmt = c.createStatement();
-                String sql = "DELETE FROM receitas WHERE nome ilike '"+ nomeReceita + "'";
+                String sql = "DELETE CASCADE FROM receitas WHERE nome ilike '"+ nomeReceita + "'";
                 int i = stmt.executeUpdate(sql);
                 if (i == 0) {
                     mensagem = "Erro ao remover!";
@@ -119,7 +119,7 @@ public class Receitas {
         int id_R;
         try {
             if ((c = bd.conectarPostsgresql()) != null) {
-                PreparedStatement psmt = c.prepareStatement("SELECT id FROM receitas WHERE nome = ?");
+                PreparedStatement psmt = c.prepareStatement("SELECT id FROM receitas WHERE nome ilike ?");
                 psmt.setString(1, nomeReceita);
                 ResultSet rs = psmt.executeQuery();
                 if (rs.next()) {
@@ -130,6 +130,7 @@ public class Receitas {
                     psmt_R.execute();
                     return "Atualizado com sucesso!";
                 }
+                return "sem resultados";
             }
             return "Base de dados desligada!";
         } catch (Exception e) {
